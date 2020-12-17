@@ -1,0 +1,10 @@
+Package: jscTools
+Type: Package
+Title: Miscellaneous helper tools developed by and for Stuart Carlton
+Version: 1.0
+Date: 2020-12-15
+Author: Stuart Carlton
+Maintainer: Stuart Carlton <stuart@somedomain.org>
+Description: These are various tools and scripts developed for use in data analysis. They are idiosyncratic, probably poorly written, but useful to me.
+License: MIT License
+RoxygenNote: 7.1.0
