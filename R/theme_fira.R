@@ -47,7 +47,7 @@ theme_fira <- function(base_family="Fira Mono", base_size = 12,
                          plot_title_face = "bold", plot_title_margin = 10,
                          subtitle_family= title_family, subtitle_size = 12,
                          subtitle_face = "plain", subtitle_margin = 15,
-                         strip_text_family = base_family, strip_text_size = 12,
+                         strip_text_family = title_family, strip_text_size = 12,
                          strip_text_face = "plain",
                          caption_family = title_family, caption_size = 6,
                          caption_face = "plain", caption_margin = 10,
@@ -56,7 +56,7 @@ theme_fira <- function(base_family="Fira Mono", base_size = 12,
                          legend_title_family = title_family, legend_title_size = 10,
                          legend_title_face = "plain",
                          plot_margin = ggplot2::margin(1, 1, 1, 1),
-                         panel_spacing = ggplot2::unit(0.5, "lines"),
+                         panel_spacing = ggplot2::unit(0.25, "lines"),
                          grid = TRUE, axis = FALSE, ticks = FALSE) {
   
   ret <- ggplot2::theme_minimal(base_family=base_family, base_size=base_size)
@@ -124,7 +124,7 @@ theme_fira <- function(base_family="Fira Mono", base_size = 12,
                                                                  family=axis_title_family, face=axis_title_face))
   ret <- ret + ggplot2::theme(axis.title.y=ggplot2::element_text(hjust=yj, size=axis_title_size,
                                                                  family=axis_title_family, face=axis_title_face))
-  ret <- ret + ggplot2::theme(strip.text=ggplot2::element_text(hjust=0, size=strip_text_size,
+  ret <- ret + ggplot2::theme(strip.text=ggplot2::element_text(hjust=0.5, size=strip_text_size,
                                                                face=strip_text_face, family=strip_text_family))
   ret <- ret + ggplot2::theme(panel.spacing.x=grid::unit(2, "lines"))
   ret <- ret + ggplot2::theme(panel.spacing.y=grid::unit(2, "lines"))

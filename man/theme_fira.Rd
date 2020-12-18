@@ -16,7 +16,7 @@ theme_fira(
   subtitle_size = 12,
   subtitle_face = "plain",
   subtitle_margin = 15,
-  strip_text_family = base_family,
+  strip_text_family = title_family,
   strip_text_size = 12,
   strip_text_face = "plain",
   caption_family = title_family,
@@ -31,7 +31,7 @@ theme_fira(
   legend_title_size = 10,
   legend_title_face = "plain",
   plot_margin = ggplot2::margin(1, 1, 1, 1),
-  panel_spacing = ggplot2::unit(0.5, "lines"),
+  panel_spacing = ggplot2::unit(0.25, "lines"),
   grid = TRUE,
   axis = FALSE,
   ticks = FALSE
