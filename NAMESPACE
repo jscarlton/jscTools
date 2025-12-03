@@ -3,6 +3,7 @@
 export(ci_high)
 export(ci_low)
 export(decruftQ)
+export(draft_order)
 export(multiplot)
 export(stderr)
 export(theme_fira)
