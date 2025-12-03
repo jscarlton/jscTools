@@ -1,0 +1,10 @@
+bibentry(
+  bibtype  = "Manual",
+  title    = "jscTools: Miscellaneous helper tools developed by and for Stuart Carlton",
+  author   = person("J. Stuart", "Carlton", email = "stuart@jscarlton.net", role = c("aut", "cre")),,
+  year         = "2025",
+  version      = "1.0.1",
+  url          = "https://github.com/jscarlton/jscTools",
+  doi          = "10.5281/zenodo.17803382",
+  textVersion  = "Carlton, J. S. (2025). jscTools: Miscellaneous helper tools developed by and for Stuart Carlton (v1.0.1). Zenodo. https://doi.org/10.5281/zenodo.17803382"
+)

@@ -7,4 +7,4 @@ Author: Stuart Carlton
 Maintainer: Stuart Carlton <stuart@jscarlton.net>
 Description: These are various tools and scripts developed for use in data analysis. They are idiosyncratic, probably poorly written, but useful to me.
 License: MIT License
-RoxygenNote: 7.1.0
+RoxygenNote: 7.3.2
