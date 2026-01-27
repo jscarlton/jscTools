@@ -29,25 +29,25 @@
 #' @examples
 #' \dontrun{
 #' # Basic usage with standard Qualtrics export
-#' survey_data <- decruftQ(here::here("data", "raw", "survey.csv"))
+#' survey_data <- decruft_q(here::here("data", "raw", "survey.csv"))
 #'
 #' # Auto-detect export format
-#' survey_data <- decruftQ("survey.csv", auto_detect = TRUE)
+#' survey_data <- decruft_q("survey.csv", auto_detect = TRUE)
 #'
 #' # With codebook renaming
-#' survey_data <- decruftQ("survey.csv", codebook = "codebook.csv")
+#' survey_data <- decruft_q("survey.csv", codebook = "codebook.csv")
 #'
 #' # Convert specific columns to Likert factors
-#' survey_data <- decruftQ("survey.csv", likert_cols = c("Q1", "Q2", "Q3"))
+#' survey_data <- decruft_q("survey.csv", likert_cols = c("Q1", "Q2", "Q3"))
 #' }
-decruftQ <- function(input_csv,
-                     skip = 3,
-                     auto_detect = FALSE,
-                     codebook = NULL,
-                     likert_cols = NULL,
-                     likert_levels = c("Strongly Disagree", "Disagree",
-                                       "Neither Agree nor Disagree",
-                                       "Agree", "Strongly Agree")) {
+decruft_q <- function(input_csv,
+                      skip = 3,
+                      auto_detect = FALSE,
+                      codebook = NULL,
+                      likert_cols = NULL,
+                      likert_levels = c("Strongly Disagree", "Disagree",
+                                        "Neither Agree nor Disagree",
+                                        "Agree", "Strongly Agree")) {
 
   library(tidyverse)
 
@@ -78,6 +78,17 @@ decruftQ <- function(input_csv,
   return(output_data)
 }
 
+#' @rdname decruft_q
+#' @usage decruftQ(...)
+#' @details \code{decruftQ} is a deprecated alias for \code{decruft_q} and
+#'   is provided for backward compatibility. Please use \code{decruft_q} in
+#'   new code.
+#' @export
+decruftQ <- function(...) {
+  .Deprecated("decruft_q")
+  decruft_q(...)
+}
+
 #' Detect Qualtrics export format
 #'
 #' Internal function to detect the export format of a Qualtrics CSV file
@@ -91,8 +102,7 @@ detect_qualtrics_format <- function(input_csv) {
   first_lines <- read_lines(input_csv, n_max = 5)
 
   # Standard Qualtrics export has 3 header rows:
-
-# Row 1: Variable names
+  # Row 1: Variable names
   # Row 2: Question text
   # Row 3: ImportId or JSON metadata
 
