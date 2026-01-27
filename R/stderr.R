@@ -1,8 +1,17 @@
-#' A function for finding the standard error
-#' 
-#' This function takes a series of numbers (vector, etc.) and finds the standard error.
-#' @param x is a list of numbers
+#' Calculate the standard error of the mean
+#'
+#' This function takes a numeric vector and calculates the standard error of the
+#' mean, handling NA values appropriately.
+#'
+#' @param x A numeric vector
+#'
+#' @return The standard error of the mean
 #' @export
+#' @importFrom stats var na.omit
+#'
 #' @examples
-#' stderr()
-stderr <- function(x){sqrt(var(x,na.rm=TRUE)/length(na.omit(x)))}
+#' x <- c(1, 2, 3, 4, 5, NA, 6)
+#' stderr(x)
+stderr <- function(x) {
+  sqrt(var(x, na.rm = TRUE) / length(na.omit(x)))
+}

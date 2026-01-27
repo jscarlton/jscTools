@@ -1,10 +1,21 @@
-#'Calculate the upper bound of the 95% confidence interval given a standard error.
-#' @param mean_var is mean of the data used to calculate the CI
-#' @param se_var is the se (typically calculated with jscTools::stderr) used to calculate the CI
+#' Calculate the upper bound of a 95% confidence interval
+#'
+#' Calculates the upper bound of a 95% confidence interval given a mean and
+#' standard error. Uses the normal approximation (z = 1.96).
+#'
+#' @param mean_var The mean value
+#' @param se_var The standard error (typically calculated with \code{\link{stderr}})
+#'
+#' @return The upper bound of the 95% CI
 #' @export
+#' @seealso \code{\link{ci_low}}, \code{\link{stderr}}
+#'
 #' @examples
-#' ci_high(mean_var, se_var)
-
-ci_high <- function(mean_var, se_var){
+#' x <- c(1, 2, 3, 4, 5)
+#' m <- mean(x)
+#' se <- stderr(x)
+#' ci_high(m, se)
+#' ci_low(m, se)
+ci_high <- function(mean_var, se_var) {
   mean_var + (1.96 * se_var)
 }

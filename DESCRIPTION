@@ -1,10 +1,44 @@
 Package: jscTools
 Type: Package
-Title: Miscellaneous helper tools developed by and for Stuart Carlton
-Version: 1.0.2
-Date: 2025-12-03
-Author: Stuart Carlton
-Maintainer: Stuart Carlton <stuart@jscarlton.net>
-Description: These are various tools and scripts developed for use in data analysis. They are idiosyncratic, probably poorly written, but useful to me.
-License: MIT License
+Title: Miscellaneous Helper Tools Developed by and for Stuart Carlton
+Version: 1.1.0
+Date: 2026-01-27
+Authors@R: person("Stuart", "Carlton",
+                  email = "stuart@jscarlton.net",
+                  role = c("aut", "cre"))
+Description: A collection of tools and scripts for data analysis, including
+    functions for importing and cleaning Qualtrics survey data, analyzing
+    Likert scale responses, calculating composite scale scores, creating
+    publication-ready tables, and custom ggplot2 themes. Designed for
+    social science research workflows.
+License: MIT + file LICENSE
+URL: https://github.com/jscarlton/jscTools
+BugReports: https://github.com/jscarlton/jscTools/issues
+Encoding: UTF-8
+LazyData: true
 RoxygenNote: 7.3.2
+Depends:
+    R (>= 4.0.0)
+Imports:
+    dplyr (>= 1.0.0),
+    ggplot2 (>= 3.4.0),
+    readr (>= 2.0.0),
+    stringr (>= 1.4.0),
+    tibble (>= 3.0.0),
+    tidyr (>= 1.2.0),
+    scales,
+    grid,
+    here,
+    rlang
+Suggests:
+    tidyverse,
+    tidytext,
+    readtext,
+    wordcloud,
+    RColorBrewer,
+    tm,
+    knitr,
+    rmarkdown,
+    gt,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr

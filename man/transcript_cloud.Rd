@@ -2,7 +2,7 @@
 % Please edit documentation in R/transcript_cloud.R
 \name{transcript_cloud}
 \alias{transcript_cloud}
-\title{A function for creating a wordcloud from a text transcript}
+\title{Create a word cloud from a text transcript}
 \usage{
 transcript_cloud(
   input_path,
@@ -16,7 +16,8 @@ transcript_cloud(
 )
 }
 \arguments{
-\item{input_path}{The path of the text file to turn into a wordcloud}
+\item{input_path}{The path of the text file to turn into a wordcloud.
+Can use \code{here::here()} for project-relative paths.}
 
 \item{save_path}{The path where you want the saved image to go. Should end in ".png".}
 
@@ -24,15 +25,35 @@ transcript_cloud(
 
 \item{cloud_height}{The height of your saved wordcloud image, in pixels. Defaults to 2000.}
 
-\item{cloud_res}{The resolution of your saved wordcloud image, in dpi Defaults to 300}
+\item{cloud_res}{The resolution of your saved wordcloud image, in dpi. Defaults to 300.}
 
-\item{cloud_max_words}{The maximum number of words you want to plot in your wordcloud. Defaults to 100.}
+\item{cloud_max_words}{The maximum number of words to plot. Defaults to 100.}
 
-\item{color_pal}{The color palette that you want to use for your wordcloud. Choose one color if you want a monochrome wordcloud or a series of colors if you want it to vary the color by the relative frequency of the word. See the wordcloud documentation for details. Defaults to c(brewer.pal(5,"Blues")[3],brewer.pal(5,"Blues")[4],brewer.pal(5,"Blues")[5])}
+\item{color_pal}{Color palette for the wordcloud. Can be a single color for
+monochrome or multiple colors to vary by word frequency. Defaults to a
+blue gradient.}
+}
+\value{
+Invisibly returns the tidy transcript data
 }
 \description{
-A function for creating a wordcloud from a text transcript
+Generates a word cloud visualization from a text file (e.g., interview
+transcript, survey responses). Removes common stop words and saves the
+result as a PNG image.
 }
-\keyword{analysis,}
-\keyword{text}
-\keyword{wordcloud}
+\examples{
+\dontrun{
+# Basic usage
+transcript_cloud(
+  here::here("data", "interview.txt"),
+  here::here("output", "figures", "interview_cloud.png")
+)
+
+# Custom colors
+transcript_cloud(
+  "interview.txt",
+  "cloud.png",
+  color_pal = c("#1a9850", "#91cf60", "#d9ef8b")
+)
+}
+}

@@ -2,16 +2,21 @@
 % Please edit documentation in R/stderr.R
 \name{stderr}
 \alias{stderr}
-\title{A function for finding the standard error}
+\title{Calculate the standard error of the mean}
 \usage{
 stderr(x)
 }
 \arguments{
-\item{x}{is a list of numbers}
+\item{x}{A numeric vector}
+}
+\value{
+The standard error of the mean
 }
 \description{
-This function takes a series of numbers (vector, etc.) and finds the standard error.
+This function takes a numeric vector and calculates the standard error of the
+mean, handling NA values appropriately.
 }
 \examples{
-stderr()
+x <- c(1, 2, 3, 4, 5, NA, 6)
+stderr(x)
 }

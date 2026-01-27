@@ -2,18 +2,29 @@
 % Please edit documentation in R/ci_low.R
 \name{ci_low}
 \alias{ci_low}
-\title{Calculate the lower bound of the 95% confidence interval given a standard error.}
+\title{Calculate the lower bound of a 95% confidence interval}
 \usage{
 ci_low(mean_var, se_var)
 }
 \arguments{
-\item{mean_var}{is mean of the data used to calculate the CI}
+\item{mean_var}{The mean value}
 
-\item{se_var}{is the se (typically calculated with jscTools::stderr) used to calculate the CI}
+\item{se_var}{The standard error (typically calculated with \code{\link{stderr}})}
+}
+\value{
+The lower bound of the 95% CI
 }
 \description{
-Calculate the lower bound of the 95% confidence interval given a standard error.
+Calculates the lower bound of a 95% confidence interval given a mean and
+standard error. Uses the normal approximation (z = 1.96).
 }
 \examples{
-ci_low(mean_var, se_var)
+x <- c(1, 2, 3, 4, 5)
+m <- mean(x)
+se <- stderr(x)
+ci_low(m, se)
+ci_high(m, se)
+}
+\seealso{
+\code{\link{ci_high}}, \code{\link{stderr}}
 }

@@ -2,16 +2,60 @@
 % Please edit documentation in R/decruftQ.R
 \name{decruftQ}
 \alias{decruftQ}
-\title{A function for finding the standard error}
+\title{Import and clean Qualtrics survey data}
 \usage{
-decruftQ(input_csv, skip = 3)
+decruftQ(
+  input_csv,
+  skip = 3,
+  auto_detect = FALSE,
+  codebook = NULL,
+  likert_cols = NULL,
+  likert_levels = c("Strongly Disagree", "Disagree", "Neither Agree nor Disagree",
+    "Agree", "Strongly Agree")
+)
 }
 \arguments{
-\item{input_csv}{is the downloaded Qualtrics csv with 3 lines of cruft at the top}
+\item{input_csv}{Path to the downloaded Qualtrics CSV file. Can use here::here()
+for project-relative paths.}
+
+\item{skip}{Number of rows to skip. Defaults to 3 for standard Qualtrics exports.
+Set to 1 if exported without extra header rows.}
+
+\item{auto_detect}{If TRUE, automatically detect the export format and adjust
+skip accordingly. Defaults to FALSE for backward compatibility.}
+
+\item{codebook}{Path to a CSV file with columns 'original' and 'new_name' for
+renaming variables. If NULL (default), no renaming is performed.}
+
+\item{likert_cols}{Character vector of column names to convert to ordered factors
+using standard 5-point Likert scale (Strongly Disagree to Strongly Agree).
+If NULL (default), no conversion is performed.}
+
+\item{likert_levels}{Character vector of factor levels for Likert conversion.
+Defaults to standard 5-point scale.}
+}
+\value{
+A tibble with cleaned Qualtrics data
 }
 \description{
-This function takes a series of numbers (vector, etc.) and finds the standard error. See http://www.jscarlton.net/post/2017-04-04QualtricsImport/ for more information.
+This function imports Qualtrics CSV exports and handles the various metadata
+rows that Qualtrics adds. It can automatically detect the export format,
+rename columns based on a codebook, and convert Likert-scale responses to
+ordered factors. See http://www.jscarlton.net/post/2017-04-04QualtricsImport/
+for more information.
 }
 \examples{
-decruftQ()
+\dontrun{
+# Basic usage with standard Qualtrics export
+survey_data <- decruftQ(here::here("data", "raw", "survey.csv"))
+
+# Auto-detect export format
+survey_data <- decruftQ("survey.csv", auto_detect = TRUE)
+
+# With codebook renaming
+survey_data <- decruftQ("survey.csv", codebook = "codebook.csv")
+
+# Convert specific columns to Likert factors
+survey_data <- decruftQ("survey.csv", likert_cols = c("Q1", "Q2", "Q3"))
+}
 }

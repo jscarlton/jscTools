@@ -1,0 +1,458 @@
+---
+title: "Qualtrics Survey Data Workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Qualtrics Survey Data Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+This vignette demonstrates a complete workflow for importing, cleaning, analyzing, and visualizing Qualtrics survey data using jscTools. The functions are designed to work seamlessly with tidyverse workflows and the `here` package for project-relative file paths.
+
+## Overview
+
+The Qualtrics workflow in jscTools includes:
+
+1. **Data Import**: `decruftQ()` - Import Qualtrics CSVs with automatic format detection
+2. **Likert Recoding**: `recode_likert()` - Convert text responses to ordered factors
+3. **Scale Computation**: `calculate_trust_scale()` - Compute composite scores with reverse coding
+4. **Visualization**: `plot_likert()` - Quick diverging bar charts for Likert data
+5. **Publication Tables**: `export_table_apa()` - APA-formatted regression and correlation tables
+
+## Setup
+
+```{r load-packages}
+library(jscTools)
+library(tidyverse)
+library(here)
+```
+
+## Step 1: Import Qualtrics Data
+
+Qualtrics exports CSV files with extra header rows containing question text and import IDs. The `decruftQ()` function handles this automatically.
+
+### Basic Import
+
+```{r basic-import}
+# Standard Qualtrics export (3 header rows)
+survey_data <- decruftQ(here("data", "raw", "my_survey.csv"))
+```
+
+### Auto-Detect Export Format
+
+Different Qualtrics export settings produce different numbers of header rows. Use `auto_detect = TRUE` to let the function figure it out:
+```{r auto-detect}
+# Automatically detect the export format
+survey_data <- decruftQ(
+  here("data", "raw", "my_survey.csv"),
+  auto_detect = TRUE
+)
+```
+
+### Using a Codebook for Column Renaming
+
+Qualtrics often assigns cryptic column names like "Q3.1_1". You can provide a codebook CSV to automatically rename columns to meaningful names:
+
+```{r codebook-example}
+# Your codebook.csv should have two columns:
+# original,new_name
+# Q3.1_1,trust_scientists
+# Q3.1_2,trust_government
+# Q4.2_1,concern_climate
+
+survey_data <- decruftQ(
+  here("data", "raw", "my_survey.csv"),
+  codebook = here("data", "codebook.csv")
+)
+```
+
+### Convert Likert Columns During Import
+
+You can also convert Likert scale columns to ordered factors during import:
+
+```{r likert-import}
+survey_data <- decruftQ(
+  here("data", "raw", "my_survey.csv"),
+  codebook = here("data", "codebook.csv"),
+  likert_cols = c("trust_scientists", "trust_government", "concern_climate")
+)
+```
+
+## Step 2: Recode Likert Scale Responses
+
+The `recode_likert()` function standardizes Likert scale responses and handles common variations in text (e.g., "strongly disagree" vs "Strongly Disagree").
+
+### Basic Recoding
+
+```{r recode-basic}
+survey_data <- survey_data %>%
+  mutate(
+    trust_sci = recode_likert(trust_scientists),
+    trust_gov = recode_likert(trust_government)
+  )
+```
+
+### Get Numeric Codes
+
+For statistical analysis, you often need numeric codes:
+
+```{r recode-numeric}
+survey_data <- survey_data %>%
+  mutate(
+    trust_sci_num = recode_likert(trust_scientists, numeric = TRUE),
+    trust_gov_num = recode_likert(trust_government, numeric = TRUE)
+  )
+```
+
+### Reverse Coding for Negatively-Worded Items
+
+```{r recode-reverse}
+# If you have a "distrust" item that needs reverse coding
+survey_data <- survey_data %>%
+  mutate(
+    distrust_reversed = recode_likert(distrust_item, reverse = TRUE, numeric = TRUE)
+  )
+```
+
+### Different Scale Types
+
+```{r recode-scales}
+# 7-point agreement scale
+survey_data <- survey_data %>%
+  mutate(agreement = recode_likert(Q5, scale = "agree7"))
+
+# Frequency scale (Never to Always)
+survey_data <- survey_data %>%
+  mutate(frequency = recode_likert(Q6, scale = "frequency5"))
+
+# Custom scale
+survey_data <- survey_data %>%
+  mutate(
+    custom_scale = recode_likert(
+      Q7,
+      scale = "custom",
+      levels = c("Not at all", "A little", "Somewhat", "Very much", "Extremely")
+    )
+  )
+```
+
+### Batch Recoding Multiple Columns
+
+```{r recode-batch}
+# Recode multiple columns at once
+trust_items <- c("trust_sci", "trust_gov", "trust_media", "trust_ngo")
+
+survey_data <- recode_likert_cols(
+  survey_data,
+  cols = trust_items,
+  suffix = "_num",
+  numeric = TRUE
+)
+```
+
+## Step 3: Calculate Composite Scale Scores
+
+The `calculate_trust_scale()` function computes composite scores from multiple items, handling reverse coding and missing data.
+
+### Basic Composite Score
+
+```{r scale-basic}
+# Calculate mean of trust items
+survey_data <- calculate_trust_scale(
+  survey_data,
+  items = c("trust_sci_num", "trust_gov_num", "trust_media_num"),
+  new_col = "trust_composite"
+)
+```
+
+### With Reverse Coding
+
+```{r scale-reverse}
+# Some items measure distrust and need to be reverse coded
+survey_data <- calculate_trust_scale(
+  survey_data,
+  items = c("trust_1", "trust_2", "distrust_1", "distrust_2"),
+  reverse_items = c("distrust_1", "distrust_2"),
+  new_col = "trust_composite"
+)
+```
+
+### Different Aggregation Methods
+
+```{r scale-methods}
+# Use sum instead of mean
+survey_data <- calculate_trust_scale(
+  survey_data,
+  items = c("t1", "t2", "t3"),
+  method = "sum",
+  new_col = "trust_sum"
+)
+
+# Use median (robust to outliers)
+survey_data <- calculate_trust_scale(
+  survey_data,
+  items = c("t1", "t2", "t3"),
+  method = "median",
+  new_col = "trust_median"
+)
+```
+
+### Multiple Subscales
+
+```{r scale-subscales}
+# Create multiple subscales in a pipeline
+survey_data <- survey_data %>%
+  calculate_trust_scale(
+    items = c("comp_1", "comp_2", "comp_3"),
+    new_col = "competence_trust"
+  ) %>%
+  calculate_trust_scale(
+    items = c("benev_1", "benev_2", "benev_3"),
+    new_col = "benevolence_trust"
+  ) %>%
+  calculate_trust_scale(
+    items = c("integ_1", "integ_2", "integ_3"),
+    new_col = "integrity_trust"
+  )
+```
+
+### Check Scale Reliability
+
+```{r reliability}
+# Calculate Cronbach's alpha
+reliability <- cronbach_alpha(survey_data, c("trust_1", "trust_2", "trust_3", "trust_4"))
+print(reliability$alpha)  # Should be > 0.70 for acceptable reliability
+
+# View item-total correlations to identify problematic items
+print(reliability$item_total_correlations)
+```
+
+## Step 4: Visualize Likert Data
+
+The `plot_likert()` function creates publication-ready diverging bar charts.
+
+### Basic Likert Plot
+
+```{r plot-basic}
+plot_likert(
+  survey_data,
+  items = c("trust_sci", "trust_gov", "trust_media")
+)
+```
+
+### With Custom Labels
+
+```{r plot-labels}
+plot_likert(
+  survey_data,
+  items = c("trust_sci", "trust_gov", "trust_media"),
+  labels = c(
+    trust_sci = "Trust in Scientists",
+    trust_gov = "Trust in Government",
+    trust_media = "Trust in Media"
+  ),
+  title = "Trust in Institutions",
+  subtitle = paste0("n = ", nrow(survey_data))
+)
+```
+
+### Customize with ggplot2
+
+Since `plot_likert()` returns a ggplot object, you can add any ggplot2 customizations:
+
+```{r plot-custom}
+plot_likert(survey_data, items = c("trust_sci", "trust_gov")) +
+  theme_fira() +
+  scale_fill_brewer(palette = "RdBu") +
+  labs(caption = "Data: My Survey 2024")
+```
+
+### Get Summary Table
+
+```{r plot-summary}
+# Get a summary table of responses
+summary_table <- likert_summary(
+  survey_data,
+  items = c("trust_sci", "trust_gov", "trust_media"),
+  labels = c(
+    trust_sci = "Scientists",
+    trust_gov = "Government",
+    trust_media = "Media"
+  )
+)
+print(summary_table)
+```
+
+## Step 5: Create Publication-Ready Tables
+
+The `export_table_apa()` function formats regression and correlation tables following APA guidelines.
+
+### Regression Table
+
+```{r table-regression}
+# Fit a model
+model <- lm(trust_composite ~ age + education + income, data = survey_data)
+
+# Create APA table
+export_table_apa(model)
+```
+
+### With Confidence Intervals and Custom Labels
+
+```{r table-ci}
+export_table_apa(
+  model,
+  ci = TRUE,
+  var_labels = c(
+    age = "Age (years)",
+    education = "Education Level",
+    income = "Household Income"
+  ),
+  caption = "Predictors of Trust in Institutions"
+)
+```
+
+### Compare Multiple Models
+
+```{r table-compare}
+# Build up models
+model1 <- lm(trust_composite ~ age, data = survey_data)
+model2 <- lm(trust_composite ~ age + education, data = survey_data)
+model3 <- lm(trust_composite ~ age + education + income, data = survey_data)
+
+# Compare side by side
+export_table_apa(
+  list(model1, model2, model3),
+  caption = "Hierarchical Regression: Predictors of Trust"
+)
+```
+
+### Correlation Matrix
+
+```{r table-correlation}
+# Create correlation matrix
+cor_vars <- c("trust_composite", "age", "education", "income")
+cor_matrix <- cor(survey_data[cor_vars], use = "pairwise.complete.obs")
+
+# Format for APA
+export_table_apa(
+  cor_matrix,
+  var_labels = c(
+    trust_composite = "Trust",
+    age = "Age",
+    education = "Education",
+    income = "Income"
+  ),
+  caption = "Correlation Matrix"
+)
+```
+
+### Copy to Clipboard
+
+For easy pasting into Word or other applications:
+
+```{r table-clipboard}
+# Copy table to clipboard (works on macOS and Windows)
+export_table_apa(model, output = "clipboard")
+```
+
+### Export to gt or kable
+
+```{r table-formats}
+# For R Markdown with knitr
+export_table_apa(model, output = "kable")
+
+# For gt tables (more formatting options)
+export_table_apa(model, output = "gt")
+```
+
+## Complete Workflow Example
+
+Here's a complete example putting it all together:
+
+```{r complete-workflow}
+library(jscTools)
+library(tidyverse)
+library(here)
+
+# 1. Import and clean data
+survey_data <- decruftQ(
+  here("data", "raw", "trust_survey.csv"),
+  auto_detect = TRUE,
+  codebook = here("data", "codebook.csv")
+)
+
+# 2. Recode Likert items to numeric
+trust_items <- c("trust_sci", "trust_gov", "trust_media", "trust_ngo")
+survey_data <- recode_likert_cols(
+  survey_data,
+  cols = trust_items,
+  suffix = "_num",
+  numeric = TRUE
+)
+
+# 3. Calculate composite trust score
+survey_data <- calculate_trust_scale(
+  survey_data,
+  items = paste0(trust_items, "_num"),
+  new_col = "trust_composite"
+)
+
+# 4. Check reliability
+reliability <- cronbach_alpha(survey_data, paste0(trust_items, "_num"))
+cat("Cronbach's alpha:", round(reliability$alpha, 3), "\n")
+
+# 5. Visualize responses
+p <- plot_likert(
+  survey_data,
+  items = trust_items,
+  labels = c(
+    trust_sci = "Scientists",
+    trust_gov = "Government",
+    trust_media = "Media",
+    trust_ngo = "NGOs"
+  ),
+  title = "Trust in Institutions"
+) + theme_fira()
+
+ggsave(here("output", "figures", "trust_likert.png"), p, width = 8, height = 6)
+
+# 6. Regression analysis
+model <- lm(trust_composite ~ age + education + political_ideology,
+            data = survey_data)
+
+# 7. Create APA table
+reg_table <- export_table_apa(
+  model,
+  ci = TRUE,
+  var_labels = c(
+    age = "Age",
+    education = "Education",
+    political_ideology = "Political Ideology"
+  )
+)
+
+print(reg_table)
+```
+
+## Tips and Best Practices
+
+1. **Use `here()` for file paths**: This ensures your code works regardless of the working directory.
+
+2. **Create a codebook early**: Document your variable names in a CSV file to make renaming consistent and reproducible.
+
+3. **Check your factor levels**: After recoding, always verify that factor levels are in the correct order using `levels()`.
+
+4. **Handle missing data explicitly**: The scale functions have `min_valid` parameters to control how missing data affects composite scores.
+
+5. **Check reliability before computing composites**: Use `cronbach_alpha()` to ensure your items hang together before combining them.
+
+6. **Customize visualizations**: The plotting functions return ggplot objects, so you can layer on any ggplot2 customizations.

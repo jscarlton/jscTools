@@ -2,18 +2,29 @@
 % Please edit documentation in R/ci_high.R
 \name{ci_high}
 \alias{ci_high}
-\title{Calculate the upper bound of the 95% confidence interval given a standard error.}
+\title{Calculate the upper bound of a 95% confidence interval}
 \usage{
 ci_high(mean_var, se_var)
 }
 \arguments{
-\item{mean_var}{is mean of the data used to calculate the CI}
+\item{mean_var}{The mean value}
 
-\item{se_var}{is the se (typically calculated with jscTools::stderr) used to calculate the CI}
+\item{se_var}{The standard error (typically calculated with \code{\link{stderr}})}
+}
+\value{
+The upper bound of the 95% CI
 }
 \description{
-Calculate the upper bound of the 95% confidence interval given a standard error.
+Calculates the upper bound of a 95% confidence interval given a mean and
+standard error. Uses the normal approximation (z = 1.96).
 }
 \examples{
-ci_high(mean_var, se_var)
+x <- c(1, 2, 3, 4, 5)
+m <- mean(x)
+se <- stderr(x)
+ci_high(m, se)
+ci_low(m, se)
+}
+\seealso{
+\code{\link{ci_low}}, \code{\link{stderr}}
 }
